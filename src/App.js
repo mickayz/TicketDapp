@@ -171,12 +171,16 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+            <a href="#" className="pure-menu-heading pure-menu-link">Crypto Tickets</a>
+            <a href="#myaccount"> My Account </a>
+            <a href="#about"> About </a>
+            <a href="#faq"> FAQ </a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
+              
               <h1>Crypto Tickets!</h1>
               <p>You are: {this.state.account}</p>
               <p>You manage {this.state.yourEventCount}</p>
