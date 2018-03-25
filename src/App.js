@@ -124,8 +124,9 @@ class App extends Component {
       console.log(error)
     }).then((result2) => {
       description += ", totalTickets: "+result2.toNumber() + "}"
-      this.state.events.push(description)
-      this.setState({events: this.state.events})
+      let events = this.state.events
+      events.push(description)
+      this.setState({events: events})
     })
   }
 
@@ -171,10 +172,14 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
+          <div>
             <a href="#" className="pure-menu-heading pure-menu-link">Crypto Tickets</a>
+          </div>
+          <div>
             <a href="#myaccount"> My Account </a>
             <a href="#about"> About </a>
             <a href="#faq"> FAQ </a>
+          </div>
         </nav>
 
         <main className="container">
