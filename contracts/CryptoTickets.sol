@@ -44,11 +44,12 @@ contract CryptoTickets is Ownable{
     // - max tickets per wallet purchase
     // - single tier pricing
     // - no image upload
-    // - no refund escrow
+    // - non refundable
     // - does not require registration
     // - does not support whitelist/blacklisting purchasers
     // - only accepts ETH
     // - priced in ETH
+
     function createEventType1(string _description, uint256 _total, uint256 _max, uint256 _price) external returns(address) {
         address newEvent = new EventTicketType1(msg.sender, _description, _total, _max, _price);
         addEvent(newEvent);
