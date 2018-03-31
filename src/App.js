@@ -1,115 +1,63 @@
 import React, { Component } from 'react'
-import { Link } from "react-router-dom" //https://serverless-stack.com/chapters/create-containers.html
-import { Nav, Navbar, NavItem } from "react-bootstrap"
-import {LinkContainer} from "react-router-bootstrap"
-import CryptoTicketsContract from '../build/contracts/CryptoTickets.json'
-import getWeb3 from './utils/getWeb3'
+import { Link } from 'react-router'
+import { HiddenOnlyAuth, VisibleOnlyAuth } from './util/wrappers.js'
 
-// For now do routes here so we can pass state
-import {Route, Switch} from "react-router-dom"
-import MyAccount from "./MyAccount"
-import Home from "./Home"
-import NotFound from "./NotFound"
+// UI Components
+import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer'
+import LogoutButtonContainer from './user/ui/logoutbutton/LogoutButtonContainer'
+import Notifications from "./layouts/Notifications"
 
-
-
-
+// Styles
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 
 class App extends Component {
-  constructor(props) {
-    super(props)
 
-    this.state = {
-      web3: null,
-      cryptoTicketsInstance: null,
-      account: null
-    }
-
+  componentDidMount(){
+    this.props.initialize()
   }
-
-  componentWillMount() {
-    // Get network provider and web3 instance.
-    // See utils/getWeb3 for more info.
-
-    getWeb3
-    .then(results => {
-      this.setState({
-        web3: results.web3
-      })
-
-      // Instantiate contract once web3 provided.
-      this.instantiateContract()
-    })
-    .catch(() => {
-      console.log('Error finding web3.')
-    })
-  }
-
-  instantiateContract() {
-    
-    const contract = require('truffle-contract')
-    const cryptoTickets = contract(CryptoTicketsContract)
-    cryptoTickets.setProvider(this.state.web3.currentProvider)
-    
-    // Get accounts
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      this.setState({account: accounts[0]})
-      cryptoTickets.deployed().then((instance) => {
-        this.setState({cryptoTicketsInstance : instance})
-        console.log("SET")
-      })
-    })
-  }
-
-
-
 
   render() {
+    const OnlyAuthLinks = VisibleOnlyAuth(() =>
+      <span>
+        <li className="pure-menu-item">
+          <Link to="/dashboard" className="pure-menu-link">Dashboard</Link>
+        </li>
+        <li className="pure-menu-item">
+          <Link to="/profile" className="pure-menu-link">Profile</Link>
+        </li>
+        <LogoutButtonContainer />
+      </span>
+    )
+
+    const OnlyGuestLinks = HiddenOnlyAuth(() =>
+      <span>
+        <li className="pure-menu-item">
+          <Link to="/signup" className="pure-menu-link">Sign Up</Link>
+        </li>
+        <LoginButtonContainer />
+      </span>
+    )
+
     return (
       <div className="App">
-        <Navbar fluid collapseOnSelect>
-          <Navbar.Header>
-            <Navbar.Brand>
-              <Link to="/">Crypto Tickets</Link>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-          </Navbar.Header>
-          <Navbar.Collapse>
-            <Nav pullRight>
-              <LinkContainer to="/myaccount">
-                <NavItem > My Account </NavItem>
-              </LinkContainer>
-              <LinkContainer to="/about">
-                <NavItem> About </NavItem>
-              </LinkContainer>
-              <LinkContainer to="/faq">
-                <NavItem> FAQ </NavItem>
-              </LinkContainer>
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
-        
-      <main className="container">
-          <div className="pure-g">
-            <div className="pure-u-1-1">
-              <Switch>
-                <Route path="/" exact component={Home} />
-                <Route path="/MyAccount" exact render={(props) => {
-                    return (<MyAccount 
-                      web3={this.state.web3}
-                      account={this.state.account}
-                      cryptoTicketsInstance={this.state.cryptoTicketsInstance}
-                      {...props} />)
-                }} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
+        <nav className="navbar pure-menu pure-menu-horizontal">
+          <ul className="pure-menu-list navbar-right">
+            <OnlyGuestLinks />
+            <OnlyAuthLinks />
+          </ul>
+          <Link to="/" className="pure-menu-heading pure-menu-link">Truffle Box</Link>
+        </nav>
+        {this.props.contract !== null && this.props.account !== null ? this.props.children :
+          <div>
+          <h1>TODO!!!!!!!!!!!!!!!!!!!!</h1>
+          <h2>TODO!!!!!!!!!!!!!!!!!!!!</h2>
+          <h3>TODO!!!!!!!!!!!!!!!!!!!!</h3>
           </div>
-        </main>
+        }
+        {/*<Notifications />*/}
       </div>
     );
   }

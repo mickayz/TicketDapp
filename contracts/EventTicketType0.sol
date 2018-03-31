@@ -13,10 +13,10 @@ import "./EventTicketBase.sol";
 // TODO: reputation system
 // TODO: image upload with ipfs
 
-// Type 1:
+// Type 0:
 // Single Price (no tiers)
 // Max tickets purchased at a time
-contract EventTicketType1 is EventTicketBase{
+contract EventTicketType0 is EventTicketBase{
 
     using SafeMath for uint256;
 
@@ -26,7 +26,7 @@ contract EventTicketType1 is EventTicketBase{
 
     event Debug(address addr);
 
-    function EventTicketType1(address _creator, string _description, uint256 _total, uint256 _max, uint256 _price) public 
+    function EventTicketType0(address _creator, string _description, uint256 _total, uint256 _max, uint256 _price) public 
         EventTicketBase(_creator, _description, _total)
     {
         maxTicketsPerWallet = _max;
@@ -44,7 +44,7 @@ contract EventTicketType1 is EventTicketBase{
         return price;
     }
 
-    function mint(address _recipient, uint256 _quantity, uint256 _amountPaid) public parentOnly canCreateNewTickets(_quantity) maxAllowed(_recipient, _quantity){
+    function mint(address _recipient, uint256 _quantity, uint256 _amountPaid) public maxAllowed(_recipient, _quantity){
         super.mint(_recipient, _quantity, _amountPaid);
     }
 
@@ -52,7 +52,15 @@ contract EventTicketType1 is EventTicketBase{
         price = _price;
     }
     
+    function transferFrom(address _from, address _to, uint256 _tokenId) public maxAllowed(_to,1) {
+        super.transferFrom(_from,_to,_tokenId);   
+    }
 
+
+
+    // Deprecated ERC721
+
+    /*
     function transfer(address _to, uint256 _tokenId) public maxAllowed(_to,1) onlyOwnerOf(_tokenId) escrowPaidForToken(_to, _tokenId){
       super.transfer(_to, _tokenId);
     }
@@ -60,5 +68,6 @@ contract EventTicketType1 is EventTicketBase{
     function takeOwnership(uint256 _tokenId) public maxAllowed(msg.sender,1) escrowPaidForToken(msg.sender, _tokenId){
       super.takeOwnership(_tokenId);
     }
+    */
     
 }

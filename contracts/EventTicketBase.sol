@@ -10,22 +10,27 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
 
     address private parent;
     address private creator;
+    
     uint256 public totalTickets;
     string public description;
 
-    //mapping from ticket to price
+    struct escrowPayment{
+        uint256 ticketId;
+        uint256 payment;
+    }
+
+    // mapping from ticket to price paid
     mapping(uint256=>uint256) public ticketPrice;
     
-    // Escrow used to verify face value purchases only
-    //mapping from payer to tokenID
-    mapping(address=>uint256) public tokenEscrow;
+    // Escrow used to verify less than or equal to face value purchases only
+    // mapping from payer to escrowPayment
+    mapping(address=>escrowPayment) public tokenEscrow;
 
-    // Used since the default ticketID in the above mapping (0) maps to a ticket
-    mapping(address=>bool) public escrowDepositted;
-    
 
  
-     function EventTicketBase(address _creator, string _description, uint256 _total) public {
+     function EventTicketBase(address _creator, string _description, uint256 _total) public 
+        ERC721Token(_description, "CRYPTOTIX")
+     {
         parent = msg.sender;
         creator = _creator;
         description = _description;
@@ -58,10 +63,12 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
     }
 
     modifier escrowPaidForToken(address _to, uint256 _tokenId){
-        require(escrowDepositted[_to] == true);
-        require(tokenEscrow[_to] == _tokenId);
+        require(tokenEscrow[_to].ticketId == _tokenId);
+        require(tokenEscrow[_to].payment > 0);
+        require(tokenEscrow[_to].payment <= ticketPrice[_tokenId]);
         _;
     }
+
 
     function mint(address _recipient, uint256 _quantity, uint256 _amountPaid) public parentOnly canCreateNewTickets(_quantity){
         uint256 paymentLeft = _amountPaid;
@@ -87,6 +94,7 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
      // TODO to think about: how can we prevent malicious hosts from making fake events
     function setDescription(string _description) public creatorOnly{
         description = _description;
+        name_ = _description;
     }
 
  
@@ -94,21 +102,32 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
      // Escrow service for transfers
 
     function payEscrow(uint256 _tokenId) payable public{
-        require(msg.value == ticketPrice[_tokenId]);
-        require(escrowDepositted[msg.sender] == false);
-        tokenEscrow[msg.sender] = _tokenId;
-        escrowDepositted[msg.sender] = true;
+        require(msg.value <= ticketPrice[_tokenId]);
+        require(tokenEscrow[msg.sender].payment == 0);
+        tokenEscrow[msg.sender] = escrowPayment(_tokenId,msg.value);
     }
     
     function withdrawEscrow() public{
-        require(escrowDepositted[msg.sender] == true);
-        escrowDepositted[msg.sender] = false;
-        // TODO check for reentrance
-        msg.sender.transfer(ticketPrice[tokenEscrow[msg.sender]]);
+        uint256 previousPayment = tokenEscrow[msg.sender].payment;
+        require(previousPayment > 0);
+        tokenEscrow[msg.sender].payment = 0;
+        msg.sender.transfer(previousPayment);
     }
 
-    // ERC721 override
+    // ERC721 Override for escrow
+    function transferFrom(address _from, address _to, uint256 _tokenId) public escrowPaidForToken(_to, _tokenId) {
+        // Super still uses the  canTransfer modifier
+        // https://ethereum.stackexchange.com/questions/21380/override-parent-method-and-modifiers
+        super.transferFrom(_from,_to,_tokenId);
+        uint256 escrowAmount = tokenEscrow[msg.sender].payment;
+        tokenEscrow[msg.sender].payment = 0;
+        _from.transfer(escrowAmount);
+    }
 
+
+    // DEPRECIATED ERC721 override
+
+    /*
     function transfer(address _to, uint256 _tokenId) public onlyOwnerOf(_tokenId) escrowPaidForToken(_to, _tokenId){
       super.transfer(_to, _tokenId);
       escrowDepositted[_to] = false;
@@ -120,6 +139,7 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
       escrowDepositted[msg.sender] = false;
       ownerOf(_tokenId).transfer(ticketPrice[_tokenId]);
     }
-
+    */
+    
     
 }
