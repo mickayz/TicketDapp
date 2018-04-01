@@ -29,6 +29,9 @@ class App extends Component {
         <li className="pure-menu-item">
           <Link to="/profile" className="pure-menu-link">Profile</Link>
         </li>
+        <li className="pure-menu-item">
+          <Link to="/create" className="pure-menu-link">Create Event</Link>
+        </li>
         <LogoutButtonContainer />
       </span>
     )
@@ -46,6 +49,9 @@ class App extends Component {
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
           <ul className="pure-menu-list navbar-right">
+            <li className="pure-menu-item">
+              <Link to="/explore" className="pure-menu-link">Explore</Link>
+            </li>
             <OnlyGuestLinks />
             <OnlyAuthLinks />
           </ul>
