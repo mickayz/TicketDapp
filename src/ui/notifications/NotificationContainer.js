@@ -6,7 +6,7 @@ import { clearNotifications } from "./NotificationActions.js"
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    notification: state.notification.messages
+    notifications: state.notification.messages
   }
 }
 

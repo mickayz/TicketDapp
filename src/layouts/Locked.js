@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 
-class Home extends Component {
+class Locked extends Component {
   render() {
     return(
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <h1>TicketsDapp!</h1>
+            <h1>Unlock Metamask!</h1> 
+            <p> ...and refresh your web browser </p>
           </div>
         </div>
       </main>
@@ -14,4 +15,4 @@ class Home extends Component {
   }
 }
 
-export default Home
+export default Locked

@@ -94,7 +94,7 @@ export let getMainContract = () => {
       return store.dispatch(mainContractInitialized(results))
     })
     .catch(error => {
-      console.error(error)
+      //console.error(error)
       throw new Error("Failed to find main contract")      
     })
   } else {

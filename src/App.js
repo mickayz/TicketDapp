@@ -6,6 +6,7 @@ import { HiddenOnlyAuth, VisibleOnlyAuth } from './util/wrappers.js'
 import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer'
 import LogoutButtonContainer from './user/ui/logoutbutton/LogoutButtonContainer'
 import Notifications from "./layouts/Notifications"
+import Locked from "./layouts/Locked"
 
 // Styles
 import './css/oswald.css'
@@ -51,13 +52,9 @@ class App extends Component {
           <Link to="/" className="pure-menu-heading pure-menu-link">Truffle Box</Link>
         </nav>
         {this.props.contract !== null && this.props.account !== null ? this.props.children :
-          <div>
-          <h1>TODO!!!!!!!!!!!!!!!!!!!!</h1>
-          <h2>TODO!!!!!!!!!!!!!!!!!!!!</h2>
-          <h3>TODO!!!!!!!!!!!!!!!!!!!!</h3>
-          </div>
+          <Locked />
         }
-        {/*<Notifications />*/}
+        <Notifications />
       </div>
     );
   }
