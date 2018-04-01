@@ -12,7 +12,6 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
     address private creator;
     
     uint256 public totalTickets;
-    string public description;
 
     struct escrowPayment{
         uint256 ticketId;
@@ -28,12 +27,11 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
 
 
  
-     function EventTicketBase(address _creator, string _description, uint256 _total) public 
+     function EventTicketBase(address _parent, address _creator, string _description, uint256 _total) public 
         ERC721Token(_description, "CRYPTOTIX")
      {
-        parent = msg.sender;
+        parent = _parent;
         creator = _creator;
-        description = _description;
         totalTickets = _total;
     }
 
@@ -41,9 +39,6 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
     //https://ethereum.stackexchange.com/questions/34267/this-contract-does-not-implement-all-functions-and-thus-cannot-be-created?rq=1
     function totalTickets() public view returns(uint256){
         return totalTickets;
-    }
-    function description() public view returns(string){
-        return description;
     }
 
 
@@ -93,7 +88,6 @@ contract EventTicketBase is EventTicketInterface, ERC721Token{
  
      // TODO to think about: how can we prevent malicious hosts from making fake events
     function setDescription(string _description) public creatorOnly{
-        description = _description;
         name_ = _description;
     }
 

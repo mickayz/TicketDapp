@@ -6,8 +6,11 @@ import "../node_modules/zeppelin-solidity/contracts/math/SafeMath.sol";
 import './EventTicketInterface.sol';
 
 // TODO probably use a factory for these
-import './EventTicketType0.sol';
+import './EventTicketType0FactoryInterface.sol';
 
+
+
+// TODO let admin delete bad events and ban users
 
 contract CryptoTickets is Ownable{
 
@@ -18,6 +21,7 @@ contract CryptoTickets is Ownable{
         uint256 ticketType;
         address contractAddr;
         address creator;
+        string description;
     }
     
     uint256 public numEvents;
@@ -27,6 +31,8 @@ contract CryptoTickets is Ownable{
 
     mapping(address => string) public usernames;
 
+    uint256 public numFactories;
+    mapping(uint256 => address) public factories;
 
     // denominator of fee percent
     // ie 100==1% fee, 1000==0.1%, etc
@@ -40,24 +46,29 @@ contract CryptoTickets is Ownable{
         setFee(_fee);
     }
 
-    function setUsername(string _name) public {
-        usernames[msg.sender] = _name;
-        
-        UsernameSet(msg.sender, _name);
-    }
 
 
     function setFee(uint256 _fee) public onlyOwner{
         feeDenominator = _fee;
     }
+
+    function addFactory(address _factory) external onlyOwner{
+        uint256 factoryId = numFactories++;
+        factories[factoryId] = _factory;
+    }
     
-    function addEvent(address _newEventAddr, uint256 _ticketType) private{
+    function addEvent(address _newEventAddr, uint256 _ticketType, string _description) private{
         uint256 eventId = numEvents++;
-        ticketEvents[eventId] = TicketEvent(eventId, _ticketType, _newEventAddr, msg.sender);
+        ticketEvents[eventId] = TicketEvent(eventId, _ticketType, _newEventAddr, msg.sender, _description);
         contractToId[_newEventAddr] = eventId;
         creatorToEvents[msg.sender].push(eventId);
         
         NewEvent(eventId);
+    }
+
+    function setUsername(string _name) public {
+        usernames[msg.sender] = _name;
+        UsernameSet(msg.sender, _name);
     }
 
     // Type 1 event has the following:
@@ -71,8 +82,11 @@ contract CryptoTickets is Ownable{
     // - priced in ETH
     // - tradeable for less than or equal to face value
     function createEventType0(string _description, uint256 _total, uint256 _max, uint256 _price) external returns(address) {
-        address newEvent = new EventTicketType0(msg.sender, _description, _total, _max, _price);
-        addEvent(newEvent,0);
+        //address newEvent = new EventTicketType0(msg.sender, _description, _total, _max, _price);
+        require(factories[0] != address(0));
+        EventTicketType0FactoryInterface factory = EventTicketType0FactoryInterface(factories[0]);
+        address newEvent = factory.newEvent(this, msg.sender, _description, _total, _max, _price);
+        addEvent(newEvent,0,_description);
         return newEvent;
     }
 

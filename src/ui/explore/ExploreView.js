@@ -12,7 +12,7 @@ export default class ExploreView extends Component {
           {this.props.events.map((ticketEvent,id)=> {
             return (
               <div key={id}>
-                <label> {ticketEvent.addr} </label>
+                <label> {ticketEvent.description} : {ticketEvent.addr} </label>
               </div>
             )})
           }

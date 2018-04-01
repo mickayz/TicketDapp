@@ -26,8 +26,8 @@ contract EventTicketType0 is EventTicketBase{
 
     event Debug(address addr);
 
-    function EventTicketType0(address _creator, string _description, uint256 _total, uint256 _max, uint256 _price) public 
-        EventTicketBase(_creator, _description, _total)
+    function EventTicketType0(address _parent, address _creator, string _description, uint256 _total, uint256 _max, uint256 _price) public 
+        EventTicketBase(_parent, _creator, _description, _total)
     {
         maxTicketsPerWallet = _max;
         price = _price;

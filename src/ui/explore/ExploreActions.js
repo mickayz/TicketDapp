@@ -40,7 +40,7 @@ export function fetchEvents(name) {
       for (let i = 0; i< result.toNumber(); i++){
         web3store.mainInstance.ticketEvents(i)
         .then(result => {
-          dispatch(addEvent({id: result[0], type: result[1], addr: result[2], creator: result[3]}))
+          dispatch(addEvent({id: result[0], type: result[1], addr: result[2], creator: result[3], description: result[4]}))
         })
       }
     })

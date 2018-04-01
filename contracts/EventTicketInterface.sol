@@ -11,7 +11,6 @@ contract EventTicketInterface is ERC721{
 
  function mint(address _recipient, uint256 _quantity, uint256 _amountPaid) public;
  function setDescription(string _description) public;
- function description() public view returns (string);
  function totalTickets() public view returns (uint256);
  function payEscrow(uint256 _tokenId) payable public;
  function withdrawEscrow() public;
